@@ -14,10 +14,10 @@ import java.util.InputMismatchException;
 
 public class Main {
     public void test() {
-        /*Result result = org.junit.runner.JUnitCore.runClasses(GraphTestCase.class);
+        Result result = org.junit.runner.JUnitCore.runClasses(GraphTestCase.class);
         for (Failure fail : result.getFailures()) {
             System.out.println(fail);
-        }*/
+        }
 
         //System.out.println(result);
         //TestRunner.run(TestTestCase.class);
