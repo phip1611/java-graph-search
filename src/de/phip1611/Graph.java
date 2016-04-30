@@ -158,11 +158,8 @@ public class Graph {
                 if (((Edge) obj).getTo() == this.to && ((Edge) obj).getFrom() == this.from) {
                     return true;
                 }
-                return false;
             }
-            else {
-                return false;
-            }
+            return false;
         }
     }
 

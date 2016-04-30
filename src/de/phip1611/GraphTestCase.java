@@ -3,6 +3,7 @@ package de.phip1611;
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.IllegalFormatCodePointException;
@@ -23,6 +24,9 @@ public class GraphTestCase extends TestCase {
         g = null;
     }
 
+
+    @Rule
+    public IllegalArgumentException thrown;
     @Test(expected = IllegalArgumentException.class)
     public void testReflexiveEdge() {
         g.addEdge(0,0);
