@@ -18,8 +18,21 @@ import java.util.function.Consumer;
  * @author Philipp Schuster (@phip1611)
  */
 public class Graph {
-    public final static int BREADTH_FIRST_SEARCH = 0;
-    public final static int DEPTH_FIRST_SEARCH = 1;
+    public enum SEARCH_ALGORITHMS {
+        BFS, DFS;
+        public GraphSearchAlgorithm init() {
+            switch (this) {
+                case BFS: {
+                    return new BreadthFirstSearchGraphSearchAlgorithm();
+                }
+                case DFS: {
+                    return new DepthFirstSearchGraphSearchAlgorithm();
+                }
+            }
+            return null;
+        }
+
+    }
 
     protected ArrayList<Edge> getEdges() {
         return edges;
@@ -126,17 +139,13 @@ public class Graph {
         this.nodes.clear();
     }
 
-    public Stack<Integer> search(int from, int to, int algorithm) {
+    public Stack<Integer> search(int from, int to, SEARCH_ALGORITHMS algorithm) {
         GraphSearchAlgorithm graphSearchAlgorithm;
-        if (algorithm == BREADTH_FIRST_SEARCH) {
-            graphSearchAlgorithm = new BreadthFirstSearchGraphSearchAlgorithm();
-        }
-        else if (algorithm == DEPTH_FIRST_SEARCH) {
-            graphSearchAlgorithm = new DepthFirstSearchGraphSearchAlgorithm();
-        }
-        else {
+        graphSearchAlgorithm = algorithm.init();
+        if (graphSearchAlgorithm == null) {
             throw new InvalidParameterException("Wrong algorithm.");
         }
+
         GraphSearchConfig graphSearchConfig = new GraphSearchConfig() {
             @Override
             public void setParams(Graph graph, Graph.Node startNode, Graph.Node destinationNode, GraphSearchAlgorithm graphSearchAlgorithm) {
@@ -244,100 +253,4 @@ public class Graph {
         }
     }
 
-
-
-
-    /*private class GraphSearchProvider extends SearchProvider {
-        private
-
-
-
-
-        private int  searchAlgorithm;
-        private Node startNode;
-        private Node destinationNode;
-        public GraphSearchProvider() {}
-        public void setParams(int start, int destination, int searchAlgorithm) {
-            if (!containsNode(start) && !containsNode(destination)) {
-                throw new de.phip1611.InvalidParameterException("Nodes not in Graph.");
-            }
-            else {
-                this.searchAlgorithm = searchAlgorithm;
-                this.startNode       = getNode(start);
-                this.destinationNode = getNode(destination);
-            }
-        }
-        public Stack<Node> search() {
-            if (this.searchAlgorithm == BREADTH_FIRST_SEARCH) {
-                return breadthFirstSearch(startNode, destinationNode);
-            }
-            else if (this.searchAlgorithm == DEPTH_FIRST_SEARCH)  {
-                return depthFirstSearch(startNode, destinationNode);
-            }
-            else {
-                throw new de.phip1611.InvalidParameterException();
-            }
-        }
-        private Stack<Node> breadthFirstSearch(Node start, Node destination) {
-            Stack<Node> pathStack = new Stack<>();
-            ArrayList<Node> nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
-            HashMap<Node,Node> nodesDiscoveredThrough;
-            boolean foundNode;
-
-            foundNode = false;
-            nodesOnCurrentLevel = new ArrayList<>();
-            nodesOnNextLevel = new ArrayList<>();
-            nodesVisited = new ArrayList<>();
-            nodesDiscoveredThrough = new HashMap<>();
-
-            nodesOnNextLevel.add(start); // Der STARTKNOTEN
-            while (!foundNode) {
-                nodesOnCurrentLevel.clear();
-                nodesOnCurrentLevel = (ArrayList<Node>) nodesOnNextLevel.clone();
-                nodesOnNextLevel.clear();
-
-                // gibt nichts mehr zu entdecken
-                if (nodesOnCurrentLevel.isEmpty()) break;
-
-                // die aktuelle Knoten-Generation komplett durchiterieren
-                for (Node currentNode : nodesOnCurrentLevel) {
-                    if (foundNode) break;
-                            //System.out.println("Aktiver Knoten: "+currentNode);
-                            //System.out.println("Knoten auf aktiver Ebene:"+ Arrays.toString(nodesOnCurrentLevel.toArray()));
-                    for (Edge edge : edges) {
-                            //System.out.println("nodes visited: "+nodesVisited);
-                            //System.out.println("nodesVisited.contains(edge.getNodeTo():"+nodesVisited.contains(edge.getNodeTo()));
-                        // alle Kanten die vom aktiven Knoten abgehen herausfiltern
-                        if (edge.getFrom().getKey() == currentNode.getKey()
-                                && !nodesVisited.contains(edge.getTo())
-                                && !nodesOnCurrentLevel.contains(edge.getTo())) {
-                                    //System.out.println(edge.getNodeTo()+" ist ein durch "+currentNode+" neu entdeckter Knoten");
-                            nodesDiscoveredThrough.put(edge.getTo(),currentNode);
-                            // Folgeknoten durch aktuellen Knoten gefunden
-                            if (edge.getTo() == destination) {
-                                    //System.out.println("Knoten gefunden!");
-                                foundNode = true;
-                                break;
-                            } else {
-                                nodesOnNextLevel.add(edge.getTo());
-                            }
-                        }
-                    }
-                    nodesVisited.add(currentNode);
-                }
-            }
-            if (foundNode) {
-                Node nodeFoundThroughPrevious = destination;
-                while (nodeFoundThroughPrevious != start) {
-                    pathStack.add(0,nodeFoundThroughPrevious);
-                    nodeFoundThroughPrevious = nodesDiscoveredThrough.get(nodeFoundThroughPrevious);
-                }
-            }
-            return pathStack;
-        }
-        private Stack<Node> depthFirstSearch(Node start, Node destination) {
-            throw new UnsupportedOperationException("to be implemented");
-            //return null;
-        }
-    }*/
 }
