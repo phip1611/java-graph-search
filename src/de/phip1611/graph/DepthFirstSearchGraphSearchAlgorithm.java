@@ -1,6 +1,4 @@
-package de.phip1611;
-
-import java.util.Stack;
+package de.phip1611.graph;
 
 public class DepthFirstSearchGraphSearchAlgorithm extends GraphSearchAlgorithm {
 

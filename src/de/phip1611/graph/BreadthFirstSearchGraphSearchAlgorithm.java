@@ -1,9 +1,8 @@
-package de.phip1611;
+package de.phip1611.graph;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 
 public class BreadthFirstSearchGraphSearchAlgorithm extends GraphSearchAlgorithm {
     @Override

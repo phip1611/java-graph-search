@@ -1,9 +1,6 @@
-package de.phip1611;
+package de.phip1611.graph;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
-import java.util.function.Consumer;
 
 /**
  * This class can be used to build graphs
@@ -149,7 +146,7 @@ public class Graph {
             @Override
             public void setParams(Graph graph, Graph.Node startNode, Graph.Node destinationNode, GraphSearchAlgorithm graphSearchAlgorithm) {
                 if (!containsNode(startNode) && !containsNode(destinationNode)) {
-                    throw new de.phip1611.InvalidParameterException("Nodes not in Graph.");
+                    throw new InvalidParameterException("Nodes not in Graph.");
                 } else {
                     this.graph = graph;
                     this.graphSearchAlgorithm = graphSearchAlgorithm;

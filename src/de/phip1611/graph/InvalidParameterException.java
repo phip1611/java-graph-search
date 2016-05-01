@@ -1,4 +1,4 @@
-package de.phip1611;
+package de.phip1611.graph;
 
 /**
  * Created by phip1611 on 01.05.16.

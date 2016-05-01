@@ -1,7 +1,5 @@
-package de.phip1611;
+package de.phip1611.graph;
 
-
-import java.util.Stack;
 
 public abstract class GraphSearchProvider extends SearchProvider {
     protected GraphSearchConfig graphSearchConfig;
