@@ -3,6 +3,7 @@ package de.phip1611;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 /**
  * This class can be used to build graphs
@@ -20,8 +21,25 @@ public class Graph {
     public final static int BREADTH_FIRST_SEARCH = 0;
     public final static int DEPTH_FIRST_SEARCH = 1;
 
+    protected ArrayList<Edge> getEdges() {
+        return edges;
+    }
+
+    private ArrayList<Node> getNodes() {
+        return nodes;
+    }
+
     private ArrayList<Edge> edges;
     private ArrayList<Node> nodes;
+
+    private GraphSearchProvider graphSearchProvider = new GraphSearchProvider() {
+        @Override
+        public Stack<Node> search(GraphSearchConfig graphSearchConfig) {
+            this.graphSearchConfig = graphSearchConfig;
+            System.out.println(graphSearchConfig);
+            return this.graphSearchConfig.graphSearchAlgorithm.search(graphSearchConfig.graph, graphSearchConfig.startNode, graphSearchConfig.destinationNode);
+        }
+    };
 
     public Graph() {
         this.edges = new ArrayList<>();
@@ -56,23 +74,15 @@ public class Graph {
         }
     }
 
-    public boolean containsEdge(Edge e) {
-        for (Edge edge : edges) {
-            if (edge.equals(e)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean containsEdge(Edge e) {
+        return edges.contains(e);
     }
 
     public boolean containsEdge(int from, int to) {
-        for (Edge edge : edges) {
-            if (edge.getFrom().getKey() == from
-                    && edge.getTo().getKey() == to) {
-                return true;
-            }
-        }
-        return false;
+        Node fromNode, toNode;
+        fromNode = getNode(from);
+        toNode   = getNode(to);
+        return edges.contains(new Edge(fromNode, toNode));
     }
 
     private boolean containsNode(int key) {
@@ -82,6 +92,10 @@ public class Graph {
             }
         }
         return false;
+    }
+
+    private boolean containsNode(Node node) {
+        return nodes.contains(node);
     }
 
     /**
@@ -112,13 +126,41 @@ public class Graph {
         this.nodes.clear();
     }
 
-    public Stack<Integer> search(int from, int to, int searchAlgorithm) {
-        SearchProvider sp = new SearchProvider();
-        Stack<Node> path = sp.setParams(from, to, searchAlgorithm);
-        System.out.println(path.toString());
+    public Stack<Integer> search(int from, int to, int algorithm) {
+        GraphSearchAlgorithm graphSearchAlgorithm;
+        if (algorithm == BREADTH_FIRST_SEARCH) {
+            graphSearchAlgorithm = new BreadthFirstSearchGraphSearchAlgorithm();
+        }
+        else if (algorithm == DEPTH_FIRST_SEARCH) {
+            graphSearchAlgorithm = new DepthFirstSearchGraphSearchAlgorithm();
+        }
+        else {
+            throw new InvalidParameterException("Wrong algorithm.");
+        }
+        GraphSearchConfig graphSearchConfig = new GraphSearchConfig() {
+            @Override
+            public void setParams(Graph graph, Graph.Node startNode, Graph.Node destinationNode, GraphSearchAlgorithm graphSearchAlgorithm) {
+                if (!containsNode(startNode) && !containsNode(destinationNode)) {
+                    throw new de.phip1611.InvalidParameterException("Nodes not in Graph.");
+                } else {
+                    this.graph = graph;
+                    this.graphSearchAlgorithm = graphSearchAlgorithm;
+                    this.startNode = getNode(startNode.getKey());
+                    this.destinationNode = getNode(destinationNode.getKey());
+                }
+            }
+        };
+        graphSearchConfig.setParams(this, getNode(from), getNode(to), graphSearchAlgorithm);
+        Stack<Node> result = graphSearchProvider.search(graphSearchConfig);
+        return GraphSearchResultBuilder.buildStatic(result);
+
+
+        /*GraphSearchProvider sp = new GraphSearchProvider();
+        sp.setParams(from, to, searchAlgorithm);
+        Stack<Node> path = sp.search();
         Stack<Integer> pathInt = new Stack<>();
         path.stream().forEach(node -> pathInt.add(node.getKey()));
-        return pathInt;
+        return pathInt;*/
     }
 
     @Override
@@ -131,7 +173,7 @@ public class Graph {
         return sb.toString();
     }
 
-    private class Edge {
+    public class Edge {
         private Node from;
         private Node to;
         public Edge(Node from, Node to) {
@@ -148,22 +190,28 @@ public class Graph {
         public String toString() {
             return String.format("Edge (%d => %d)\n", getFrom().getKey(), getTo().getKey());
         }
-        /*@Override
-        public int hashCode() {
-            return this.from.getKey() + this.to.getKey();
-        }*/
+
         @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Edge) {
-                if (((Edge) obj).getTo() == this.to && ((Edge) obj).getFrom() == this.from) {
-                    return true;
-                }
-            }
-            return false;
+        public int hashCode() {
+            int result = from.hashCode();
+            result = 31 * result + to.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Edge)) return false;
+
+            Edge edge = (Edge) o;
+
+            if (!from.equals(edge.from)) return false;
+            return to.equals(edge.to);
+
         }
     }
 
-    private class Node {
+    public class Node {
         private int key;
         private Node (int key) {
             this.key = key;
@@ -178,30 +226,59 @@ public class Graph {
         public String toString() {
             return "Node:"+this.getKey();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Node)) return false;
+
+            Node node = (Node) o;
+
+            return key == node.key;
+
+        }
+
+        @Override
+        public int hashCode() {
+            return key;
+        }
     }
 
-    private class SearchProvider {
-        public int searchMethod;
-        public SearchProvider() {}
-        public Stack<Node> setParams(int start, int destination, int searchAlgorithm) {
-            Node startNode, destinationNode;
+
+
+
+    /*private class GraphSearchProvider extends SearchProvider {
+        private
+
+
+
+
+        private int  searchAlgorithm;
+        private Node startNode;
+        private Node destinationNode;
+        public GraphSearchProvider() {}
+        public void setParams(int start, int destination, int searchAlgorithm) {
             if (!containsNode(start) && !containsNode(destination)) {
-                throw new de.phip1611.InvalidParameterException();
-            } else {
-                startNode       = getNode(start);
-                destinationNode = getNode(destination);
-                if (this.searchMethod == BREADTH_FIRST_SEARCH) {
-                    return breadthFirstSearch(startNode, destinationNode);
-                }
-                else if (this.searchMethod == DEPTH_FIRST_SEARCH)  {
-                    return depthFirstSearch(startNode, destinationNode);
-                }
-                else {
-                    throw new de.phip1611.InvalidParameterException();
-                }
+                throw new de.phip1611.InvalidParameterException("Nodes not in Graph.");
+            }
+            else {
+                this.searchAlgorithm = searchAlgorithm;
+                this.startNode       = getNode(start);
+                this.destinationNode = getNode(destination);
             }
         }
-        public Stack<Node> breadthFirstSearch(Node start, Node destination) {
+        public Stack<Node> search() {
+            if (this.searchAlgorithm == BREADTH_FIRST_SEARCH) {
+                return breadthFirstSearch(startNode, destinationNode);
+            }
+            else if (this.searchAlgorithm == DEPTH_FIRST_SEARCH)  {
+                return depthFirstSearch(startNode, destinationNode);
+            }
+            else {
+                throw new de.phip1611.InvalidParameterException();
+            }
+        }
+        private Stack<Node> breadthFirstSearch(Node start, Node destination) {
             Stack<Node> pathStack = new Stack<>();
             ArrayList<Node> nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
             HashMap<Node,Node> nodesDiscoveredThrough;
@@ -258,9 +335,9 @@ public class Graph {
             }
             return pathStack;
         }
-        public Stack<Node> depthFirstSearch(Node start, Node destination) {
+        private Stack<Node> depthFirstSearch(Node start, Node destination) {
             throw new UnsupportedOperationException("to be implemented");
             //return null;
         }
-    }
+    }*/
 }
