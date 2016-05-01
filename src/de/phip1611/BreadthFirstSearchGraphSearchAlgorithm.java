@@ -7,8 +7,8 @@ import java.util.Stack;
 
 public class BreadthFirstSearchGraphSearchAlgorithm extends GraphSearchAlgorithm {
     @Override
-    public Stack<Graph.Node> search(Graph graph, Graph.Node startNode, Graph.Node destinationNode) {
-        Stack<Graph.Node> pathStack = new Stack<>();
+    public ArrayListStack<Graph.Node> search(Graph graph, Graph.Node startNode, Graph.Node destinationNode) {
+        ArrayListStack<Graph.Node> pathStack = new ArrayListStack<>();
         ArrayList<Graph.Node> nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
         HashMap<Graph.Node,Graph.Node> nodesDiscoveredThrough;
         boolean foundNode;

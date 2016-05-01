@@ -23,6 +23,18 @@ public class Main {
         g.addEdge(8,6);
         g.addEdge(6,4);
         g.addEdge(9,6);
-        System.out.println(g.search(0,7,Graph.SEARCH_ALGORITHMS.BFS));
+        ArrayListStack<Integer> result = g.search(0, 7, Graph.SEARCH_ALGORITHMS.BFS);
+
+        LinkedListStack<Integer> yoStack = new LinkedListStack<>();
+        yoStack.add(0);
+        yoStack.add(2);
+        yoStack.add(4);
+        yoStack.add(6);
+
+        int yo = yoStack.size();
+        for (int i = 0; i < yo; i++) {
+            System.out.println(yoStack.pop());
+            System.out.println(yoStack);
+        }
     }
 }

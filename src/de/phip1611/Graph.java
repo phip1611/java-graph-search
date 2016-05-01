@@ -31,7 +31,6 @@ public class Graph {
             }
             return null;
         }
-
     }
 
     protected ArrayList<Edge> getEdges() {
@@ -47,7 +46,7 @@ public class Graph {
 
     private GraphSearchProvider graphSearchProvider = new GraphSearchProvider() {
         @Override
-        public Stack<Node> search(GraphSearchConfig graphSearchConfig) {
+        public ArrayListStack<Node> search(GraphSearchConfig graphSearchConfig) {
             this.graphSearchConfig = graphSearchConfig;
             System.out.println(graphSearchConfig);
             return this.graphSearchConfig.graphSearchAlgorithm.search(graphSearchConfig.graph, graphSearchConfig.startNode, graphSearchConfig.destinationNode);
@@ -139,7 +138,7 @@ public class Graph {
         this.nodes.clear();
     }
 
-    public Stack<Integer> search(int from, int to, SEARCH_ALGORITHMS algorithm) {
+    public ArrayListStack<Integer> search(int from, int to, SEARCH_ALGORITHMS algorithm) {
         GraphSearchAlgorithm graphSearchAlgorithm;
         graphSearchAlgorithm = algorithm.init();
         if (graphSearchAlgorithm == null) {
@@ -160,8 +159,8 @@ public class Graph {
             }
         };
         graphSearchConfig.setParams(this, getNode(from), getNode(to), graphSearchAlgorithm);
-        Stack<Node> result = graphSearchProvider.search(graphSearchConfig);
-        return GraphSearchResultBuilder.buildStatic(result);
+        ArrayListStack<Node> result = graphSearchProvider.search(graphSearchConfig);
+        return new GraphSearchResultBuilder().build(result);
 
 
         /*GraphSearchProvider sp = new GraphSearchProvider();
