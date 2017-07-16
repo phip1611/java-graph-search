@@ -3,11 +3,12 @@ package de.phip1611.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class BreadthFirstSearchGraphSearchAlgorithm extends GraphSearchAlgorithm {
+public class BreadthFirstSearchGraphSearchAlgorithm implements GraphSearchAlgorithm {
     @Override
-    public ArrayListStack<Graph.Node> search(Graph graph, Graph.Node startNode, Graph.Node destinationNode) {
-        ArrayListStack<Graph.Node> pathStack = new ArrayListStack<>();
+    public Stack<Graph.Node> search(List<Graph.Edge> edges, Graph.Node startNode, Graph.Node destinationNode) {
+        Stack<Graph.Node> pathStack = new Stack<>();
         ArrayList<Graph.Node> nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
         HashMap<Graph.Node,Graph.Node> nodesDiscoveredThrough;
         boolean foundNode;
@@ -32,7 +33,7 @@ public class BreadthFirstSearchGraphSearchAlgorithm extends GraphSearchAlgorithm
                 if (foundNode) break;
                 //System.out.println("Aktiver Knoten: "+currentNode);
                 //System.out.println("Knoten auf aktiver Ebene:"+ Arrays.toString(nodesOnCurrentLevel.toArray()));
-                for (Graph.Edge edge : graph.getEdges()) {
+                for (Graph.Edge edge : edges) {
                     //System.out.println("nodes visited: "+nodesVisited);
                     //System.out.println("nodesVisited.contains(edge.getNodeTo():"+nodesVisited.contains(edge.getNodeTo()));
                     // alle Kanten die vom aktiven Knoten abgehen herausfiltern

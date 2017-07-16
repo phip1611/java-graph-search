@@ -1,6 +1,9 @@
 package de.phip1611.graph;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static de.phip1611.graph.GraphSearchResultBuilder.build;
 
 /**
  * This class can be used to build graphs
@@ -15,20 +18,6 @@ import java.util.ArrayList;
  * @author Philipp Schuster (@phip1611)
  */
 public class Graph {
-    public enum SEARCH_ALGORITHMS {
-        BFS, DFS;
-        public GraphSearchAlgorithm init() {
-            switch (this) {
-                case BFS: {
-                    return new BreadthFirstSearchGraphSearchAlgorithm();
-                }
-                case DFS: {
-                    return new DepthFirstSearchGraphSearchAlgorithm();
-                }
-            }
-            return null;
-        }
-    }
 
     protected ArrayList<Edge> getEdges() {
         return edges;
@@ -40,15 +29,6 @@ public class Graph {
 
     private ArrayList<Edge> edges;
     private ArrayList<Node> nodes;
-
-    private GraphSearchProvider graphSearchProvider = new GraphSearchProvider() {
-        @Override
-        public ArrayListStack<Node> search(GraphSearchConfig graphSearchConfig) {
-            this.graphSearchConfig = graphSearchConfig;
-            System.out.println(graphSearchConfig);
-            return this.graphSearchConfig.graphSearchAlgorithm.search(graphSearchConfig.graph, graphSearchConfig.startNode, graphSearchConfig.destinationNode);
-        }
-    };
 
     public Graph() {
         this.edges = new ArrayList<>();
@@ -110,7 +90,7 @@ public class Graph {
     /**
      * Returns the node object.
      * If it's not available yet a node
-     * with the specific key will be created.
+     * with the specific key <strong>will be created</strong>.
      * @param key
      * @return
      */
@@ -135,37 +115,24 @@ public class Graph {
         this.nodes.clear();
     }
 
-    public ArrayListStack<Integer> search(int from, int to, SEARCH_ALGORITHMS algorithm) {
+    /**
+     * Durchsucht den Graphen nach einem Pfad von A nach B
+     * mit dem gewählten Algorithmus.
+     * @param from
+     * @param to
+     * @param algorithm
+     * @return
+     */
+    public List<Integer> search(int from, int to, SearchAlgorithms algorithm) {
         GraphSearchAlgorithm graphSearchAlgorithm;
         graphSearchAlgorithm = algorithm.init();
         if (graphSearchAlgorithm == null) {
-            throw new InvalidParameterException("Wrong algorithm.");
+            throw new IllegalArgumentException("Wrong algorithm.");
         }
 
-        GraphSearchConfig graphSearchConfig = new GraphSearchConfig() {
-            @Override
-            public void setParams(Graph graph, Graph.Node startNode, Graph.Node destinationNode, GraphSearchAlgorithm graphSearchAlgorithm) {
-                if (!containsNode(startNode) && !containsNode(destinationNode)) {
-                    throw new InvalidParameterException("Nodes not in Graph.");
-                } else {
-                    this.graph = graph;
-                    this.graphSearchAlgorithm = graphSearchAlgorithm;
-                    this.startNode = getNode(startNode.getKey());
-                    this.destinationNode = getNode(destinationNode.getKey());
-                }
-            }
-        };
-        graphSearchConfig.setParams(this, getNode(from), getNode(to), graphSearchAlgorithm);
-        ArrayListStack<Node> result = graphSearchProvider.search(graphSearchConfig);
-        return new GraphSearchResultBuilder().build(result);
-
-
-        /*GraphSearchProvider sp = new GraphSearchProvider();
-        sp.setParams(from, to, searchAlgorithm);
-        Stack<Node> path = sp.search();
-        Stack<Integer> pathInt = new Stack<>();
-        path.stream().forEach(node -> pathInt.add(node.getKey()));
-        return pathInt;*/
+        graphSearchAlgorithm = algorithm.init();
+        Stack<Node> result = graphSearchAlgorithm.search(this.getEdges(), this.getNode(from), this.getNode(to));
+        return build(result);
     }
 
     @Override
@@ -178,6 +145,10 @@ public class Graph {
         return sb.toString();
     }
 
+    /**
+     * Repräsentiert eine Kante, die stets gerichtet
+     * von einem Knoten zum anderen verläuft.
+     */
     public class Edge {
         private Node from;
         private Node to;
@@ -216,6 +187,10 @@ public class Graph {
         }
     }
 
+    /**
+     * Repräsentiert einen Knoten.
+     * Eindeutig identifiziert durch seine Knotennummer.
+     */
     public class Node {
         private int key;
         private Node (int key) {
