@@ -5,8 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class GraphSearchTest {
@@ -28,24 +26,17 @@ public class GraphSearchTest {
 
     @Test
     public void test() {
-        List<Integer> expected1 = new ArrayList<>();
-        expected1.add(2); expected1.add(8);
+        List<Integer> expected1 = List.of(2, 8);
+        List<Integer> expected2 = List.of();
+        List<Integer> expected3 = List.of(2, 8, 7);
+        List<Integer> expected4 = List.of();
+        List<Integer> expected5 = List.of(7, 5, 2, 0);
 
-        List<Integer> expected2 = new ArrayList<>();
-
-        List<Integer> expected3 = new ArrayList<>();
-        expected3.add(2); expected3.add(8); expected3.add(7);
-
-        List<Integer> expected4 = new ArrayList<>();
-
-        List<Integer> expected5 = new ArrayList<>();
-        expected5.add(7); expected5.add(5); expected5.add(2); expected5.add(0);
-
-        List<Integer> actual1 = graph.search(0, 8, SearchAlgorithms.BFS);
-        List<Integer> actual2 = graph.search(0, 0, SearchAlgorithms.BFS);
-        List<Integer> actual3 = graph.search(0, 7, SearchAlgorithms.BFS);
+        List<Integer> actual1 = graph.search(0,  8, SearchAlgorithms.BFS);
+        List<Integer> actual2 = graph.search(0,  0, SearchAlgorithms.BFS);
+        List<Integer> actual3 = graph.search(0,  7, SearchAlgorithms.BFS);
         List<Integer> actual4 = graph.search(0, 20, SearchAlgorithms.BFS);
-        List<Integer> actual5 = graph.search(8, 0, SearchAlgorithms.BFS);
+        List<Integer> actual5 = graph.search(8,  0, SearchAlgorithms.BFS);
 
         Assert.assertEquals(expected1, actual1);
         Assert.assertEquals(expected2, actual2);

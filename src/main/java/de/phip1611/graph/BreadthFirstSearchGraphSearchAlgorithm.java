@@ -1,28 +1,29 @@
 package de.phip1611.graph;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class BreadthFirstSearchGraphSearchAlgorithm implements GraphSearchAlgorithm {
     @Override
-    public Stack<Graph.Node> search(List<Graph.Edge> edges, Graph.Node startNode, Graph.Node destinationNode) {
-        Stack<Graph.Node> pathStack = new Stack<>();
-        ArrayList<Graph.Node> nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
-        HashMap<Graph.Node,Graph.Node> nodesDiscoveredThrough;
+    public NodeList search(List<Graph.Edge> edges, Graph.Node startNode, Graph.Node destinationNode) {
+        NodeList pathNodeList, nodesOnCurrentLevel, nodesOnNextLevel, nodesVisited;
+        HashMap<Graph.Node, Graph.Node> nodesDiscoveredThrough;
         boolean foundNode;
 
         foundNode = false;
-        nodesOnCurrentLevel = new ArrayList<>();
-        nodesOnNextLevel = new ArrayList<>();
-        nodesVisited = new ArrayList<>();
+
+        pathNodeList           = new NodeList();
+        nodesOnCurrentLevel    = new NodeList();
+        nodesOnNextLevel       = new NodeList();
+        nodesVisited           = new NodeList();
+
         nodesDiscoveredThrough = new HashMap<>();
 
         nodesOnNextLevel.add(startNode); // Der STARTKNOTEN
         while (!foundNode) {
             nodesOnCurrentLevel.clear();
-            nodesOnCurrentLevel = (ArrayList<Graph.Node>) nodesOnNextLevel.clone();
+            nodesOnCurrentLevel = (NodeList) nodesOnNextLevel.clone();
             nodesOnNextLevel.clear();
 
             // gibt nichts mehr zu entdecken
@@ -58,10 +59,10 @@ public class BreadthFirstSearchGraphSearchAlgorithm implements GraphSearchAlgori
         if (foundNode) {
             Graph.Node nodeFoundThroughPrevious = destinationNode;
             while (nodeFoundThroughPrevious != startNode) {
-                pathStack.add(0,nodeFoundThroughPrevious);
+                pathNodeList.add(0,nodeFoundThroughPrevious);
                 nodeFoundThroughPrevious = nodesDiscoveredThrough.get(nodeFoundThroughPrevious);
             }
         }
-        return pathStack;
+        return pathNodeList;
     }
 }

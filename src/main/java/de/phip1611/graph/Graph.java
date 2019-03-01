@@ -3,8 +3,6 @@ package de.phip1611.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.phip1611.graph.GraphSearchResultBuilder.build;
-
 /**
  * This class can be used to build graphs
  * as in the mathematically graph theory.
@@ -19,14 +17,6 @@ import static de.phip1611.graph.GraphSearchResultBuilder.build;
  */
 public class Graph {
 
-    protected ArrayList<Edge> getEdges() {
-        return edges;
-    }
-
-    private ArrayList<Node> getNodes() {
-        return nodes;
-    }
-
     private ArrayList<Edge> edges;
     private ArrayList<Node> nodes;
 
@@ -39,39 +29,44 @@ public class Graph {
         this.addEdge(from, to, false);
     }
 
-    public void addEdge(int from, int to, boolean edgeIsBidirectional) {
-        Node nodeFrom, nodeTo;
-        Edge edge;
-        nodeFrom = getNode(from);
-        nodeTo   = getNode(to);
-        edge = new Edge(nodeFrom, nodeTo);
-        if (edge.getFrom() == edge.getTo()) {
+    public void addEdge(int from, int to, boolean bidirectional) {
+        if (from == to) {
             //System.err.printf("Reflexive edges (%d => %d) are NOT allowed.\n", from, to);
             throw new IllegalArgumentException(
                     String.format("Reflexive edges (%d => %d) are NOT allowed.\n", from, to));
         }
-        else if (containsEdge(edge)) {
+
+        Node nodeFrom, nodeTo;
+        Edge edge, edgeBack;
+
+        nodeFrom = getNode(from);
+        nodeTo   = getNode(to);
+
+        edge = new Edge(nodeFrom, nodeTo);
+
+        if (!this.containsEdge(edge)) {
+            this.edges.add(edge);
+        }
+        else {
             //System.err.printf("Edge (%d => %d) already in Graph! Cannot add same edges multiple times.\n", from, to);
             throw new IllegalArgumentException(
                     String.format("Edge (%d => %d) already in Graph! Cannot add same edges multiple times.\n", from, to));
         }
-        else {
-            this.edges.add(edge);
-        }
-        if (edgeIsBidirectional) {
-            this.addEdge(to, from, false);
+
+        if (bidirectional) {
+            edgeBack = new Edge(nodeTo, nodeFrom);
+            if (!this.containsEdge(edgeBack)) {
+                this.edges.add(edgeBack);
+            }
         }
     }
 
-    private boolean containsEdge(Edge e) {
+    public boolean containsEdge(Edge e) {
         return edges.contains(e);
     }
 
-    public boolean containsEdge(int from, int to) {
-        Node fromNode, toNode;
-        fromNode = getNode(from);
-        toNode   = getNode(to);
-        return edges.contains(new Edge(fromNode, toNode));
+    public ArrayList<Edge> getEdges() {
+        return edges;
     }
 
     private boolean containsNode(int key) {
@@ -81,10 +76,6 @@ public class Graph {
             }
         }
         return false;
-    }
-
-    private boolean containsNode(Node node) {
-        return nodes.contains(node);
     }
 
     /**
@@ -107,6 +98,7 @@ public class Graph {
                 return node;
             }
         }
+
         return null;
     }
 
@@ -131,8 +123,8 @@ public class Graph {
         }
 
         graphSearchAlgorithm = algorithm.init();
-        Stack<Node> result = graphSearchAlgorithm.search(this.getEdges(), this.getNode(from), this.getNode(to));
-        return build(result);
+        NodeList result = graphSearchAlgorithm.search(this.getEdges(), this.getNode(from), this.getNode(to));
+        return graphSearchAlgorithm.toKeyList(result);
     }
 
     @Override
@@ -150,18 +142,22 @@ public class Graph {
      * von einem Knoten zum anderen verläuft.
      */
     public class Edge {
+
         private Node from;
         private Node to;
+
         public Edge(Node from, Node to) {
             this.from = from;
             this.to   = to;
         }
+
         public Node getTo() {
             return to;
         }
         public Node getFrom() {
             return from;
         }
+
         @Override
         public String toString() {
             return String.format("Edge (%d => %d)\n", getFrom().getKey(), getTo().getKey());
@@ -193,15 +189,19 @@ public class Graph {
      */
     public class Node {
         private int key;
+
         private Node (int key) {
             this.key = key;
         }
+
         public int getKey() {
             return key;
         }
+
         public void setKey(int key) {
             this.key = key;
         }
+
         @Override
         public String toString() {
             return "Node:"+this.getKey();
